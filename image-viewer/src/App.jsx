@@ -4,7 +4,22 @@ import FileView from './components/FileView';
 import ClusterView from './components/ClusterView';
 import axios from 'axios';
 
-const categoriesList = ['car', 'person', 'nature', 'architecture', 'animal', 'fish'];
+const categoriesList = [
+  'car',
+  'person',
+  'nature',
+  'architecture',
+  'animal',
+  'fish',
+  'bikes',
+  'technology',
+  'food',
+  'sports',
+  'fashion',
+  'music',
+  'travel'
+];
+
 
 const getCategoryById = (id) => {
   return categoriesList[id % categoriesList.length];
@@ -13,19 +28,18 @@ const getCategoryById = (id) => {
 const App = () => {
   const [images, setImages] = useState([]);
   const [hasMore, setHasMore] = useState(true);
-  const [viewMode, setViewMode] = useState('clusterView'); // Set clusterView as default
+  const [viewMode, setViewMode] = useState('clusterView');
   const [filters, setFilters] = useState('');
 
   const fetchRandomImages = async () => {
     try {
-      // Generate 20 random images using lorem picsum
       const newImages = Array.from({ length: 20 }, (_, index) => ({
-        id: Math.floor(Math.random() * 1000), // Generate a random ID for the image
-        urls: { small: `https://picsum.photos/200/300?random=${index}` }, // Use lorempicsum for random images
-        categories: [getCategoryById(index)], // Assign random category
+        id: Math.floor(Math.random() * 1000),
+        urls: { small: `https://picsum.photos/200/300?random=${index}` },
+        categories: [getCategoryById(index)],
       }));
       setImages((prevImages) => [...prevImages, ...newImages]);
-      setHasMore(true); // Reset hasMore to true when fetching new images
+      setHasMore(true);
     } catch (error) {
       console.error('Error fetching random images:', error);
       setHasMore(false);
@@ -54,24 +68,24 @@ const App = () => {
 
   const loadMoreImages = () => {
     if (viewMode === 'fileView') {
-      fetchRandomImages(); // Fetch random images in File View mode
+      fetchRandomImages();
     } else if (viewMode === 'clusterView') {
-      categoriesList.forEach((category) => fetchImagesByCategory(category)); // Fetch images by category in Cluster View mode
+      categoriesList.forEach((category) => fetchImagesByCategory(category));
     }
   };
 
   useEffect(() => {
     if (viewMode === 'fileView') {
-      setImages([]); // Reset images when switching to File View
-      loadMoreImages(); // Fetch random images immediately when switching to File View
+      setImages([]);
+      loadMoreImages();
     } else if (viewMode === 'clusterView') {
       setImages([])
-      loadMoreImages(); // Load images based on category in Cluster View
+      loadMoreImages();
     }
   }, [viewMode]);
 
   const filteredImages = images.filter((image) => {
-    if (filters.trim() === '') return true; // If no filter, return all images
+    if (filters.trim() === '') return true;
     return image.categories.some((category) =>
       category.toLowerCase() === filters.trim().toLowerCase()
     );
@@ -106,14 +120,15 @@ const App = () => {
         </button>
       </div>
 
-      <div className="mb-4">
+      {viewMode === "clusterView" ? <div className="mb-4">
         <input
           type="text"
           placeholder="Filter by category (e.g., car, person)"
           className="w-full px-4 py-2 border rounded-md"
           onChange={(e) => setFilters(e.target.value.toLowerCase())}
         />
-      </div>
+      </div> : ""}
+
 
       {viewMode === 'fileView' ? (
         <InfiniteScroll
